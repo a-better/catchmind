@@ -1,0 +1,61 @@
+#scoreBoard {
+	position:absolute;
+    top:5%;
+    left:5%;
+    font-size: 2vw;
+}
+#thumbnail {
+	width : 15%;
+	height : auto;
+}
+#sketch {
+}
+html, body {
+    background: #ffffff;
+}
+#chat_div{
+	position : absolute;
+	overflow:auto;
+	top : 60%;
+	left : 5%;
+	right : 5%;
+	width : 90%;
+	height : 20%;
+}
+#chat{
+	position : relative;
+	width : 100%;
+	font-size : 16px;
+	height : 100%;
+}
+#message_box_div {
+	position : absolute;
+	top: 80%;
+	left : 5%;
+	right : 5%;
+	width : 90%;
+	height: 10%;
+}
+#message_box {
+	position : relative;
+	width : 100%;
+	height : 100%;
+	font-size : 16px;
+	z-index : 10;
+}
+#color_picker {
+	position : absolute;
+	z-index : 5;
+	top : 5%;
+	right : 0%;
+}
+#control_div {
+	position : absolute;
+	top : 0%;
+	right : 0%;
+}
+#timer_div {
+	position : absolute;
+	top : 0%;
+	left : 0%;
+}
