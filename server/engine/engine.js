@@ -121,7 +121,7 @@ Engine.prototype = {
 		}, room.gameInterval*1000);
 	},
 	searchRoomById : function(roomId){
-		if(typeof engine.rooms[roomId] == 'undefined'){
+		if(engine.rooms[roomId] === undefined){
 			return false;
 		}
 		else{

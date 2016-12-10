@@ -39,6 +39,9 @@ Network.prototype = {
 		network.sendRoomInfo(this.id, data.roomId);
 		//console.log('engine.onJoinRoom 38 line roomId : ' + data);
 		var room = network.engine.searchRoomById(data.roomId);
+		if(!room){
+			network.engine.createRoom(data.roomId);
+		}
 		network.engine.addPlayer(this.id, data, room);
 		this.broadcast.to(data.roomId).emit('add player',{id : this.id, contents : data});
 		//console.log('player Number: ' + room.length);
