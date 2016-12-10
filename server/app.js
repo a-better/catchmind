@@ -9,10 +9,8 @@ var app		= express();
 var server = app.listen(3000);
 app.use(bodyParser.urlencoded({ extended: false }));
 
-rooms = [];//setTimeOut은 재귀적으로 실행되기 때문에 전역 변수가 아니면 변수의 현재 상태를 받아 처리할수 없습니다. 
 
-rounds = []; //setTimeOut은 재귀적으로 실행되기 때문에 전역 변수가 아니면 변수의 현재 상태를 받아 처리할수 없습니다. 
-engine = new Engine();
+var engine = new Engine();
 engine.network.setConnection(server);
 
 
@@ -44,7 +42,6 @@ app.post('/:roomId', function(req, res){
 });
 function init() {
 	engine.network.setEventHandlers();
-	engine.network.setEventHandlers2();
 	console.log("catch mind init");
 	//engine.socket.setBroadcastingLoop();
 

@@ -1,4 +1,5 @@
-var Network = function(){
+var Network = function(engine){
+	this.engine = engine;
 	network = this;
 	roomId = 0;
 };
@@ -22,77 +23,66 @@ Network.prototype = {
 			//client.on("send data", this.onSendData);
 		});
 	},
-	setEventHandlers2: function(){
-		io.on("connection", function(client) {
-			console.log('connected !'+ ':'+ client.id);
-			client.on("aa", network.aa);
-			//client.on('change turn', network.onChangeTurn);
-			//client.on("send data", this.onSendData);
-		});
-	},
-	aa : function(){
-		console.log('aa');
-	},
 	onCreateRoom : function(data){
-		engine.createRoom(roomId);
+		network.engine.createRoom(roomId);
 		network.sendRoomById(this.id, roomId);
 		roomId++;			
 	},
 	sendRoomById :function(clientId, roomId){
-	   	var room = engine.searchRoomById(roomId);	
+	   	var room = network.engine.searchRoomById(roomId);	
 		io.to(clientId).emit('send room', {room : room});
 	},
 	onJoinRoom : function(data){
 		this.roomId = data.roomId;
 		this.join(data.roomId);
-		var room = io.sockets.adapter.rooms[data.roomId];
+		//var room = io.sockets.adapter.rooms[data.roomId];
 		network.sendRoomInfo(this.id, data.roomId);
-		console.log('engine.onJoinRoom 38 line roomId : ' + data);
-		engine.addPlayer(this.id, data);
+		//console.log('engine.onJoinRoom 38 line roomId : ' + data);
+		var room = network.engine.searchRoomById(data.roomId);
+		network.engine.addPlayer(this.id, data, room);
 		this.broadcast.to(data.roomId).emit('add player',{id : this.id, contents : data});
-		console.log('player Number: ' + room.length);
+		//console.log('player Number: ' + room.length);
 	},
 	onSendMessage : function(data){
 		//console.log(data.contents);
 		if(data.tag == 'paint'){
-			var room = engine.searchRoomById(data.roomId);
-			var index = engine.searchRoomIndexById(data.roomId);	
+			var room = network.engine.searchRoomById(data.roomId);
 			var paint = data.contents;	
-			//console.log('network.onSendMessage line 49 ' + index);
-			rooms[index].addPaint(paint.oldX, paint.oldY, paint.x, paint.y, paint.rgba, paint.brushSize);
+			room.addPaint(paint.oldX, paint.oldY, paint.x, paint.y, paint.rgba, paint.brushSize);
 			this.broadcast.to(data.roomId).emit('paint', paint);
 		}
 		else if(data.tag == 'chat'){
 			console.log(data.contents);
 			this.broadcast.to(data.roomId).emit('chat', data.contents);
-			engine.checkAnswer(data.roomId, this.id, data.contents.text);
+			var room =  network.engine.searchRoomById(data.roomId);
+			network.engine.checkAnswer(room, this.id, data.contents.text);
 		}
 		else if(data.tag == 'clear'){
-			var room = engine.searchRoomById(data.roomId);
-			var index = engine.searchRoomIndexById(data.roomId);
-			console.log('network.onSendMessage line 61 : ' + index);	
-			rooms[index].paints = [];
+			var room =  network.engine.searchRoomById(data.roomId);	
+			room.paints = [];
 			this.broadcast.to(data.roomId).emit('clear canvas');
 		}
 		else if(data.tag == 'send answer'){
-			engine.setAnswer(data.roomId, data.contents.answer);
+			 var room =  network.engine.searchRoomById(data.roomId);
+			 network.engine.setAnswer(room, data.contents.answer);
 		}
 		else if(data.tag =='request paints'){
-			var paints = engine.getPaints(data.roomId);
+			var paints =  network.engine.getPaints(data.roomId);
 			var jsondata = JSON.stringify(paints);
 			network.sendMessage(this.id, data.roomId, 'send paints', jsondata);
 		}
 	},
 	sendRoomInfo : function(clientId, roomId){
-		var room = engine.searchRoomById(roomId);
+		var room =  network.engine.searchRoomById(roomId);
 		var jsondata = JSON.stringify(room);
 		console.log(jsondata);
 		io.to(clientId).emit('send room info', jsondata);
 	},
 	onClientDisconnect : function(){
 		console.log('onClientDisconnect roomId: ' + this.roomId);
-		if(typeof this.roomId !== 'undefined'){
-			engine.removePlayer(this.roomId, this.id);
+		if(typeof this.roomId != 'undefined'){
+			var room = engine.searchRoomById(this.roomId);
+			network.engine.removePlayer(room, this.id);
 			this.leave(this.roomId);
 			this.broadcast.to(this.roomId).emit('remove player', {id : this.id});
 		}
@@ -114,7 +104,7 @@ Network.prototype = {
 		}
 	},
 	onCheckRoom : function(data){
-		var room = engine.searchRoomById(data.roomId);
+		var room =  network.engine.searchRoomById(data.roomId);
 		if(room == false){
 			io.to(this.id).emit('no exist');
 		}
