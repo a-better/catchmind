@@ -50,6 +50,7 @@ Engine.prototype = {
 		//console.log('rooms[index]  :' + roomId +  '/'+index+ '/' + room + '/' + rooms[index]);
 		room.clearGame();
 		room.startGame();
+		clearTimeout(engine.rounds[room.id]);
 		var round = setTimeout(
 			function(){
 				room.nextPlayer = null;
@@ -133,7 +134,7 @@ Engine.prototype = {
 	},
 	removeById : function(id){
 		delete engine.rooms[id];
-		return rooms;	
+		return engine.rooms;	
 	}
 };
 
